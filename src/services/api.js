@@ -1,5 +1,16 @@
 const API_BASE_URL = "https://rebuilt-backend-beta.vercel.app"|| 'http://localhost:4000'
 
+function getAuthHeaders() {
+	const token = localStorage.getItem('token')
+	const headers = {
+		'Content-Type': 'application/json',
+	}
+	if (token) {
+		headers['Authorization'] = `Bearer ${token}`
+	}
+	return headers
+}
+
 async function handleResponse(response) {
 	if (response.status === 204) {
 		return null
@@ -29,27 +40,46 @@ export async function getCategories() {
 }
 
 export async function createCategory(name) {
+	const token = localStorage.getItem('token')
+	const headers = {
+		'Content-Type': 'application/json',
+	}
+	if (token) {
+		headers['Authorization'] = `Bearer ${token}`
+	}
+
 	const response = await fetch(`${API_BASE_URL}/api/categories`, {
 		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
+		headers: headers,
 		body: JSON.stringify({name}),
 	})
 	return handleResponse(response)
 }
-export async function  sendPageVisit  (page,timestamp,userAgent)  {
-    try {
+
+export async function sendPageVisit(page, timestamp, userAgent) {
+	try {
+		const token = localStorage.getItem('token')
+		const headers = {
+			'Content-Type': 'application/json',
+		}
+		if (token) {
+			headers['Authorization'] = `Bearer ${token}`
+		}
+
 		const response = await fetch(`${API_BASE_URL}/api/analytics/visit`, {
-		page,
-		timestamp,
-		userAgent,
-	})
-	 return handleResponse(response)
-      } catch (error) {
-        console.error('Error tracking page visit:', error);
-      }
-    };
+			method: 'POST',
+			headers: headers,
+			body: JSON.stringify({
+				page,
+				timestamp,
+				userAgent,
+			}),
+		})
+		return handleResponse(response)
+	} catch (error) {
+		console.error('Error tracking page visit:', error);
+	}
+}
 
 export async function deleteCategory(id) {
 	const response = await fetch(`${API_BASE_URL}/api/categories/${id}`, {
@@ -65,16 +95,30 @@ export async function getBlogs() {
 }
 
 export async function createBlog(formData) {
+	const token = localStorage.getItem('token')
+	const headers = {}
+	if (token) {
+		headers['Authorization'] = `Bearer ${token}`
+	}
+
 	const response = await fetch(`${API_BASE_URL}/api/blogs`, {
 		method: 'POST',
+		headers: headers,
 		body: formData, // FormData for file upload
 	})
 	return handleResponse(response)
 }
 
 export async function updateBlog(id, formData) {
+	const token = localStorage.getItem('token')
+	const headers = {}
+	if (token) {
+		headers['Authorization'] = `Bearer ${token}`
+	}
+
 	const response = await fetch(`${API_BASE_URL}/api/blogs/${id}`, {
 		method: 'PUT',
+		headers: headers,
 		body: formData, // FormData for file upload
 	})
 	return handleResponse(response)
@@ -98,8 +142,8 @@ export async function getBlogById(id) {
 }
 
 export async function searchBlogs(query) {
-  const response = await fetch(`${API_BASE_URL}/api/blogs?search=${encodeURIComponent(query)}`);
-  return handleResponse(response);
+	const response = await fetch(`${API_BASE_URL}/api/blogs?search=${encodeURIComponent(query)}`);
+	return handleResponse(response);
 }
 
 // Main Stories API functions
@@ -109,11 +153,17 @@ export async function getMainStories() {
 }
 
 export async function addToMainStories(blogId) {
+	const token = localStorage.getItem('token')
+	const headers = {
+		'Content-Type': 'application/json',
+	}
+	if (token) {
+		headers['Authorization'] = `Bearer ${token}`
+	}
+
 	const response = await fetch(`${API_BASE_URL}/api/main-stories`, {
 		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
+		headers: headers,
 		body: JSON.stringify({blogId}),
 	})
 	return handleResponse(response)
@@ -133,11 +183,17 @@ export async function getTrendingStories() {
 }
 
 export async function addToTrendingStories(blogId) {
+	const token = localStorage.getItem('token')
+	const headers = {
+		'Content-Type': 'application/json',
+	}
+	if (token) {
+		headers['Authorization'] = `Bearer ${token}`
+	}
+
 	const response = await fetch(`${API_BASE_URL}/api/trending-stories`, {
 		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
+		headers: headers,
 		body: JSON.stringify({blogId}),
 	})
 	return handleResponse(response)
@@ -160,8 +216,15 @@ export async function getNewsCarousel() {
 }
 
 export async function createNewsCarousel(formData) {
+	const token = localStorage.getItem('token')
+	const headers = {}
+	if (token) {
+		headers['Authorization'] = `Bearer ${token}`
+	}
+
 	const response = await fetch(`${API_BASE_URL}/api/news-carousel`, {
 		method: 'POST',
+		headers: headers,
 		body: formData, // FormData for file upload
 	})
 	return handleResponse(response)
