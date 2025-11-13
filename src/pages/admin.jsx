@@ -43,6 +43,7 @@ export default function AdminPanel() {
   const [blogSubmitting, setBlogSubmitting] = useState(false);
   const [editModal, setEditModal] = useState({ isOpen: false, blog: null });
   const [deleteBlogModal, setDeleteBlogModal] = useState({ isOpen: false, blogId: null, blogTitle: '' });
+  const [isAuth, setIsAuth] = useState(false);
 
   // Main Stories state
   const [mainStories, setMainStories] = useState([]);
@@ -63,6 +64,15 @@ export default function AdminPanel() {
 
   useEffect(() => {
     fetchCategories();
+  }, []);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      router.push("/login");   // redirect if missing
+    } else {
+      setIsAuth(true);         // allow panel to load
+    }
   }, []);
 
   useEffect(() => {
@@ -499,6 +509,13 @@ export default function AdminPanel() {
   function truncateText(text, maxLength) {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
+  }
+  if (!isAuth) {
+    return (
+      <div className="h-screen flex items-center justify-center text-gray-600">
+        Checking authentication...
+      </div>
+    );
   }
 
   return (
