@@ -5,7 +5,7 @@ import { Clock, Users, BarChart } from 'lucide-react';
 const getAnalyticsData = async (page) => {
 
   // In a real app, you would fetch from your backend:
-  const response = await fetch(`https://rebuilt-backend-beta.vercel.app/api/analytics/${page}`);
+  const response = await fetch(`https://rebuilt-backend-beta.vercel.app/api/analytics/stats/${page}`);
   if (!response.ok) {
     throw new Error('Failed to fetch analytics data');
   }
