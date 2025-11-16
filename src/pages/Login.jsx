@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
+import { login } from "../services/api";
 
 export default function Login({ SetIsAuthenticated }) {
   const navigate = useNavigate();
@@ -22,36 +23,19 @@ export default function Login({ SetIsAuthenticated }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
     try {
-      // TODO: Replace with real API call
-      const response = await fetch(
-        "/api/auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        // Store token or user data in localStorage/sessionStorage
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data._id));
-        localStorage.setItem("role", data.role);
-        console.log("Login successful:", data);
-        // Redirect to dashboard
-        SetIsAuthenticated(true);
-        navigate("/admin");
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || "Login failed. Please try again.");
-        console.log("Login error in else block:", errorData);
-      }
+      const data = await login(formData.email, formData.password);
+      // Store token or user data in localStorage/sessionStorage
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data._id));
+      localStorage.setItem("role", data.role);
+      console.log("Login successful:", data);
+      // Redirect to dashboard
+      SetIsAuthenticated(true);
+      navigate("/admin");
     } catch (err) {
-      setError("Network error. Please check your connection.");
+      setError(err.message || "Login failed. Please try again.");
       console.log("Login error catched:", err);
     } finally {
       setLoading(false);
