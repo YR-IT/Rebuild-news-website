@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { login } from "../services/api";
 
-export default function Login({ SetIsAuthenticated }) {
+export default function Login() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -32,7 +32,6 @@ export default function Login({ SetIsAuthenticated }) {
       localStorage.setItem("role", data.role);
       console.log("Login successful:", data);
       // Redirect to dashboard
-      SetIsAuthenticated(true);
       navigate("/admin");
     } catch (err) {
       setError(err.message || "Login failed. Please try again.");

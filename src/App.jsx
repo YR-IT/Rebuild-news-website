@@ -1,20 +1,15 @@
+import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/home';
 import AdminPanel from './pages/admin';
 import CategoryPage from './pages/CategoryPage';
 import BlogPage from './pages/BlogPage';
 import Login from './pages/Login';
-
-const PrivateRoute = ({ children }) => {
-  const token = localStorage.getItem('token');
-  const role = localStorage.getItem('role');
-  if (token && role === 'admin') {
-    return children;
-  }
-  return <Navigate to="/login" />;
-};
+import AnalyticsTab from './components/admin/AnalyticsTab';
 
 function App() {
+  // Initialize authentication state from localStorage
+
   return (
     <BrowserRouter>
       <Routes>
@@ -22,14 +17,17 @@ function App() {
         <Route
           path="/admin"
           element={
-            <PrivateRoute>
-              <AdminPanel />
-            </PrivateRoute>
+           <AdminPanel/>
           }
         />
         <Route path="/category/:slug" element={<CategoryPage />} />
         <Route path="/blog/:id" element={<BlogPage />} />
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/login"
+          element={<Login  />}
+        />
+        <Route path='/analytics' element={<AnalyticsTab/>}/>
+       
       </Routes>
     </BrowserRouter>
   );
