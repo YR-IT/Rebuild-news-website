@@ -50,7 +50,7 @@ export async function createCategory(name) {
 		headers['Authorization'] = `Bearer ${token}`
 	}
 
-	const response = await fetch(`${API_BASE_URL}/api/categories`, {
+	const response = await fetch(`${API_BASE_URL}/api/categories/createcategory`, {
 		method: 'POST',
 		headers: headers,
 		body: JSON.stringify({name}),
@@ -92,7 +92,7 @@ export async function deleteCategory(id) {
 
 // Blog API functions
 export async function getBlogs() {
-	const response = await fetch(`${API_BASE_URL}/api/blogs`)
+	const response = await fetch(`${API_BASE_URL}/api/blogs/getblogs`)
 	return handleResponse(response)
 }
 
@@ -103,7 +103,7 @@ export async function createBlog(formData) {
 		headers['Authorization'] = `Bearer ${token}`
 	}
 
-	const response = await fetch(`${API_BASE_URL}/api/blogs`, {
+	const response = await fetch(`${API_BASE_URL}/api/blogs/createblogs`, {
 		method: 'POST',
 		headers: headers,
 		body: formData, // FormData for file upload
@@ -118,7 +118,7 @@ export async function updateBlog(id, formData) {
 		headers['Authorization'] = `Bearer ${token}`
 	}
 
-	const response = await fetch(`${API_BASE_URL}/api/blogs/${id}`, {
+	const response = await fetch(`${API_BASE_URL}/api/blogs/updateblog/${id}`, {
 		method: 'PUT',
 		headers: headers,
 		body: formData, // FormData for file upload
