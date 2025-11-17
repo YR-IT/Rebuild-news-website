@@ -93,7 +93,7 @@ export async function sendPageVisit(page, timestamp, userAgent) {
 }
 
 export async function deleteCategory(id) {
-	const response = await fetch(`${API_BASE_URL}/api/categories/${id}`, {
+	const response = await fetch(`${API_BASE_URL}/api/categories/deletecategoryid/${id}`, {
 		method: 'DELETE',
 		headers: getAuthHeaders(),
 	})
