@@ -150,7 +150,7 @@ export async function searchBlogs(query) {
 
 // Main Stories API functions
 export async function getMainStories() {
-	const response = await fetch(`${API_BASE_URL}/api/main-stories`)
+	const response = await fetch(`${API_BASE_URL}/api/main-stories/getstories`)
 	return handleResponse(response)
 }
 
@@ -163,7 +163,7 @@ export async function addToMainStories(blogId) {
 		headers['Authorization'] = `Bearer ${token}`
 	}
 
-	const response = await fetch(`${API_BASE_URL}/api/main-stories`, {
+	const response = await fetch(`${API_BASE_URL}/api/main-stories/createstories`, {
 		method: 'POST',
 		headers: headers,
 		body: JSON.stringify({blogId}),
