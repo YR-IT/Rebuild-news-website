@@ -127,7 +127,7 @@ export async function updateBlog(id, formData) {
 }
 
 export async function deleteBlog(id) {
-	const response = await fetch(`${API_BASE_URL}/api/blogs/${id}`, {
+	const response = await fetch(`${API_BASE_URL}/api/blogs/deleteblog/${id}`, {
 		method: 'DELETE',
 	})
 	return handleResponse(response)
