@@ -172,7 +172,7 @@ export async function addToMainStories(blogId) {
 }
 
 export async function removeFromMainStories(blogId) {
-	const response = await fetch(`${API_BASE_URL}/api/main-stories/${blogId}`, {
+	const response = await fetch(`${API_BASE_URL}/api/main-stories/removefromstories/${blogId}`, {
 		method: 'DELETE',
 	})
 	return handleResponse(response)
