@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://rebuild-india-backend.vercel.app"|| 'http://localhost:4000'
+const API_BASE_URL = "https://vercel.com/anants-projects-e048a6fd/rebuilt-backend"|| 'http://localhost:4000'
 
 function getAuthHeaders() {
 	const token = localStorage.getItem('token')
