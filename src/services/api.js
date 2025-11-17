@@ -35,7 +35,9 @@ async function handleResponse(response) {
 }
 
 export async function getCategories() {
-	const response = await fetch(`${API_BASE_URL}/api/categories`)
+	const response = await fetch(`${API_BASE_URL}/api/categories/getcategory`, {
+		method: 'GET',
+	})
 	return handleResponse(response)
 }
 
