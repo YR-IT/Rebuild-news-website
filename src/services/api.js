@@ -139,7 +139,7 @@ export async function getBlogsByCategory(slug) {
 }
 
 export async function getBlogById(id) {
-	const response = await fetch(`${API_BASE_URL}/api/blogs/${id}`)
+	const response = await fetch(`${API_BASE_URL}/api/blogs/blogbyid/${id}`)
 	return handleResponse(response)
 }
 
