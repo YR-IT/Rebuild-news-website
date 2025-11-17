@@ -1,10 +1,19 @@
-const API_BASE_URL = "https://rebuilt-backend-beta.vercel.app"|| 'http://localhost:4000'
+const API_BASE_URL = "https://rebuild-india-backend.vercel.app"|| 'http://localhost:4000'
 
 function getAuthHeaders() {
 	const token = localStorage.getItem('token')
 	const headers = {
 		'Content-Type': 'application/json',
 	}
+	if (token) {
+		headers['Authorization'] = `Bearer ${token}`
+	}
+	return headers
+}
+
+function getAuthHeadersForFormData() {
+	const token = localStorage.getItem('token')
+	const headers = {}
 	if (token) {
 		headers['Authorization'] = `Bearer ${token}`
 	}
@@ -86,6 +95,7 @@ export async function sendPageVisit(page, timestamp, userAgent) {
 export async function deleteCategory(id) {
 	const response = await fetch(`${API_BASE_URL}/api/categories/${id}`, {
 		method: 'DELETE',
+		headers: getAuthHeaders(),
 	})
 	return handleResponse(response)
 }
@@ -97,30 +107,18 @@ export async function getBlogs() {
 }
 
 export async function createBlog(formData) {
-	const token = localStorage.getItem('token')
-	const headers = {}
-	if (token) {
-		headers['Authorization'] = `Bearer ${token}`
-	}
-
 	const response = await fetch(`${API_BASE_URL}/api/blogs/createblogs`, {
 		method: 'POST',
-		headers: headers,
+		headers: getAuthHeadersForFormData(),
 		body: formData, // FormData for file upload
 	})
 	return handleResponse(response)
 }
 
 export async function updateBlog(id, formData) {
-	const token = localStorage.getItem('token')
-	const headers = {}
-	if (token) {
-		headers['Authorization'] = `Bearer ${token}`
-	}
-
 	const response = await fetch(`${API_BASE_URL}/api/blogs/updateblog/${id}`, {
 		method: 'PUT',
-		headers: headers,
+		headers: getAuthHeadersForFormData(),
 		body: formData, // FormData for file upload
 	})
 	return handleResponse(response)
@@ -129,6 +127,7 @@ export async function updateBlog(id, formData) {
 export async function deleteBlog(id) {
 	const response = await fetch(`${API_BASE_URL}/api/blogs/deleteblog/${id}`, {
 		method: 'DELETE',
+		headers: getAuthHeaders(),
 	})
 	return handleResponse(response)
 }
@@ -174,6 +173,7 @@ export async function addToMainStories(blogId) {
 export async function removeFromMainStories(blogId) {
 	const response = await fetch(`${API_BASE_URL}/api/main-stories/removefromstories/${blogId}`, {
 		method: 'DELETE',
+		headers: getAuthHeaders(),
 	})
 	return handleResponse(response)
 }
@@ -206,6 +206,7 @@ export async function removeFromTrendingStories(blogId) {
 		`${API_BASE_URL}/api/trending-stories/${blogId}`,
 		{
 			method: 'DELETE',
+			headers: getAuthHeaders(),
 		}
 	)
 	return handleResponse(response)
@@ -235,6 +236,7 @@ export async function createNewsCarousel(formData) {
 export async function deleteNewsCarousel(id) {
 	const response = await fetch(`${API_BASE_URL}/api/news-carousel/${id}`, {
 		method: 'DELETE',
+		headers: getAuthHeaders(),
 	})
 	return handleResponse(response)
 }
