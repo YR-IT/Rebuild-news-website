@@ -180,7 +180,7 @@ export async function removeFromMainStories(blogId) {
 
 // Trending Stories API functions
 export async function getTrendingStories() {
-	const response = await fetch(`${API_BASE_URL}/api/trending-stories`)
+	const response = await fetch(`${API_BASE_URL}/api/trending-stories/gettrending`)
 	return handleResponse(response)
 }
 
@@ -193,7 +193,7 @@ export async function addToTrendingStories(blogId) {
 		headers['Authorization'] = `Bearer ${token}`
 	}
 
-	const response = await fetch(`${API_BASE_URL}/api/trending-stories`, {
+	const response = await fetch(`${API_BASE_URL}/api/trending-stories/createtrending`, {
 		method: 'POST',
 		headers: headers,
 		body: JSON.stringify({blogId}),
@@ -214,7 +214,7 @@ export async function removeFromTrendingStories(blogId) {
 
 // News Carousel API functions
 export async function getNewsCarousel() {
-	const response = await fetch(`${API_BASE_URL}/api/news-carousel`)
+	const response = await fetch(`${API_BASE_URL}/api/news-carousel/getnews`)
 	return handleResponse(response)
 }
 
@@ -225,7 +225,7 @@ export async function createNewsCarousel(formData) {
 		headers['Authorization'] = `Bearer ${token}`
 	}
 
-	const response = await fetch(`${API_BASE_URL}/api/news-carousel`, {
+	const response = await fetch(`${API_BASE_URL}/api/news-carousel/createnews`, {
 		method: 'POST',
 		headers: headers,
 		body: formData, // FormData for file upload
@@ -234,7 +234,7 @@ export async function createNewsCarousel(formData) {
 }
 
 export async function deleteNewsCarousel(id) {
-	const response = await fetch(`${API_BASE_URL}/api/news-carousel/${id}`, {
+	const response = await fetch(`${API_BASE_URL}/api/news-carousel/deletenews/${id}`, {
 		method: 'DELETE',
 		headers: getAuthHeaders(),
 	})
