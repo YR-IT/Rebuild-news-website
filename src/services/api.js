@@ -11,6 +11,15 @@ function getAuthHeaders() {
 	return headers
 }
 
+function getAuthHeadersForFormData() {
+	const token = localStorage.getItem('token')
+	const headers = {}
+	if (token) {
+		headers['Authorization'] = `Bearer ${token}`
+	}
+	return headers
+}
+
 async function handleResponse(response) {
 	if (response.status === 204) {
 		return null
@@ -35,7 +44,9 @@ async function handleResponse(response) {
 }
 
 export async function getCategories() {
-	const response = await fetch(`${API_BASE_URL}/api/categories`)
+	const response = await fetch(`${API_BASE_URL}/api/categories/getcategory`, {
+		method: 'GET',
+	})
 	return handleResponse(response)
 }
 
@@ -48,7 +59,7 @@ export async function createCategory(name) {
 		headers['Authorization'] = `Bearer ${token}`
 	}
 
-	const response = await fetch(`${API_BASE_URL}/api/categories`, {
+	const response = await fetch(`${API_BASE_URL}/api/categories/createcategory`, {
 		method: 'POST',
 		headers: headers,
 		body: JSON.stringify({name}),
@@ -82,51 +93,41 @@ export async function sendPageVisit(page, timestamp, userAgent) {
 }
 
 export async function deleteCategory(id) {
-	const response = await fetch(`${API_BASE_URL}/api/categories/${id}`, {
+	const response = await fetch(`${API_BASE_URL}/api/categories/deletecategoryid/${id}`, {
 		method: 'DELETE',
+		headers: getAuthHeaders(),
 	})
 	return handleResponse(response)
 }
 
 // Blog API functions
 export async function getBlogs() {
-	const response = await fetch(`${API_BASE_URL}/api/blogs`)
+	const response = await fetch(`${API_BASE_URL}/api/blogs/getblogs`)
 	return handleResponse(response)
 }
 
 export async function createBlog(formData) {
-	const token = localStorage.getItem('token')
-	const headers = {}
-	if (token) {
-		headers['Authorization'] = `Bearer ${token}`
-	}
-
-	const response = await fetch(`${API_BASE_URL}/api/blogs`, {
+	const response = await fetch(`${API_BASE_URL}/api/blogs/createblogs`, {
 		method: 'POST',
-		headers: headers,
+		headers: getAuthHeadersForFormData(),
 		body: formData, // FormData for file upload
 	})
 	return handleResponse(response)
 }
 
 export async function updateBlog(id, formData) {
-	const token = localStorage.getItem('token')
-	const headers = {}
-	if (token) {
-		headers['Authorization'] = `Bearer ${token}`
-	}
-
-	const response = await fetch(`${API_BASE_URL}/api/blogs/${id}`, {
+	const response = await fetch(`${API_BASE_URL}/api/blogs/updateblog/${id}`, {
 		method: 'PUT',
-		headers: headers,
+		headers: getAuthHeadersForFormData(),
 		body: formData, // FormData for file upload
 	})
 	return handleResponse(response)
 }
 
 export async function deleteBlog(id) {
-	const response = await fetch(`${API_BASE_URL}/api/blogs/${id}`, {
+	const response = await fetch(`${API_BASE_URL}/api/blogs/deleteblog/${id}`, {
 		method: 'DELETE',
+		headers: getAuthHeaders(),
 	})
 	return handleResponse(response)
 }
@@ -137,7 +138,7 @@ export async function getBlogsByCategory(slug) {
 }
 
 export async function getBlogById(id) {
-	const response = await fetch(`${API_BASE_URL}/api/blogs/${id}`)
+	const response = await fetch(`${API_BASE_URL}/api/blogs/blogbyid/${id}`)
 	return handleResponse(response)
 }
 
@@ -148,7 +149,7 @@ export async function searchBlogs(query) {
 
 // Main Stories API functions
 export async function getMainStories() {
-	const response = await fetch(`${API_BASE_URL}/api/main-stories`)
+	const response = await fetch(`${API_BASE_URL}/api/main-stories/getstories`)
 	return handleResponse(response)
 }
 
@@ -161,7 +162,7 @@ export async function addToMainStories(blogId) {
 		headers['Authorization'] = `Bearer ${token}`
 	}
 
-	const response = await fetch(`${API_BASE_URL}/api/main-stories`, {
+	const response = await fetch(`${API_BASE_URL}/api/main-stories/createstories`, {
 		method: 'POST',
 		headers: headers,
 		body: JSON.stringify({blogId}),
@@ -170,8 +171,9 @@ export async function addToMainStories(blogId) {
 }
 
 export async function removeFromMainStories(blogId) {
-	const response = await fetch(`${API_BASE_URL}/api/main-stories/${blogId}`, {
+	const response = await fetch(`${API_BASE_URL}/api/main-stories/removefromstories/${blogId}`, {
 		method: 'DELETE',
+		headers: getAuthHeaders(),
 	})
 	return handleResponse(response)
 }
@@ -204,6 +206,7 @@ export async function removeFromTrendingStories(blogId) {
 		`${API_BASE_URL}/api/trending-stories/${blogId}`,
 		{
 			method: 'DELETE',
+			headers: getAuthHeaders(),
 		}
 	)
 	return handleResponse(response)
@@ -233,6 +236,7 @@ export async function createNewsCarousel(formData) {
 export async function deleteNewsCarousel(id) {
 	const response = await fetch(`${API_BASE_URL}/api/news-carousel/${id}`, {
 		method: 'DELETE',
+		headers: getAuthHeaders(),
 	})
 	return handleResponse(response)
 }
