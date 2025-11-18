@@ -69,7 +69,9 @@ export default function AdminPanel() {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      router.push("/login");   // redirect if missing
+        
+      window.location.href = "/login"; // Redirect to login page
+      // redirect if missing
     } else {
       setIsAuth(true);         // allow panel to load
     }
