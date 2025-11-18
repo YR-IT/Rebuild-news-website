@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import { 
   getCategories, createCategory, deleteCategory, 
@@ -62,15 +61,6 @@ export default function AdminPanel() {
   const [carouselImagePreview, setCarouselImagePreview] = useState(null);
   const [carouselSubmitting, setCarouselSubmitting] = useState(false);
   const [deleteCarouselModal, setDeleteCarouselModal] = useState({ isOpen: false, itemId: null, itemHeadline: '' });
-
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-    }
-  }, [navigate]);
 
   useEffect(() => {
     fetchCategories();
