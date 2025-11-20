@@ -46,12 +46,10 @@ const CategorySection = ({ category }) => {
   }
 
   if (blogs.length === 0) {
-    return null; // Don't show section if no blogs in this category
+    return null; 
   }
 
-  // First blog is the featured one (latest)
   const featuredBlog = blogs[0];
-  // Next 4 blogs are shown in the sidebar
   const sidebarBlogs = blogs.slice(1, 5);
 
   return (
@@ -59,14 +57,16 @@ const CategorySection = ({ category }) => {
       <div className="max-w-6xl mx-auto px-2 sm:px-3 py-6">
         <h2 className="text-gray-800 font-semibold mb-3">{category.name}</h2>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-          {/* Featured Blog - Large Card */}
           <div className="md:col-span-8">
-            <div className="bg-white border border-gray-200 rounded overflow-hidden card-hover h-full">
+            <div
+              className="bg-white border border-gray-200 rounded overflow-hidden card-hover h-full block"
+              onClick={() => window.location.href = `/blog/${featuredBlog.id || featuredBlog._id}`}
+            >
               <div className="relative h-52 md:h-60">
-                <img 
-                  src={featuredBlog.image} 
-                  alt={featuredBlog.title} 
-                  className="w-full h-full object-cover" 
+                <img
+                  src={featuredBlog.image}
+                  alt={featuredBlog.title}
+                  className="w-full h-full object-cover"
                 />
               </div>
               <div className="p-3">
@@ -83,19 +83,18 @@ const CategorySection = ({ category }) => {
               </div>
             </div>
           </div>
-
-          {/* Sidebar Blogs - 4 Small Tiles */}
           <div className="md:col-span-4 space-y-3">
             {sidebarBlogs.length > 0 ? (
               sidebarBlogs.map((blog) => (
-                <div 
-                  key={blog._id} 
+                <div
+                  key={blog.id || blog._id}
                   className="bg-white border border-gray-200 rounded p-3 flex gap-3 items-start card-hover"
+                  onClick={() => window.location.href = `/blog/${blog.id || blog._id}`}
                 >
-                  <img 
-                    src={blog.image} 
-                    alt={blog.title} 
-                    className="w-20 h-16 object-cover rounded shrink-0" 
+                  <img
+                    src={blog.image}
+                    alt={blog.title}
+                    className="w-20 h-16 object-cover rounded shrink-0"
                   />
                   <div className="min-w-0 flex-1">
                     <Pill text={blog.categoryId?.name?.toUpperCase() || category.name.toUpperCase()} />
@@ -142,8 +141,13 @@ const CategorySections = () => {
 
   if (loading) {
     return (
+      <div>
+
       <div className="flex items-center justify-center py-12">
+
+      </div>
         <div className="text-gray-500">Loading categories...</div>
+  
       </div>
     );
   }

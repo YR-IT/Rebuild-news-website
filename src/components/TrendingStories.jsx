@@ -14,12 +14,44 @@ const BlogCard = ({ blog }) => {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
+  const handleNavigate = async () => {
+    try {
+      let slug = blog.slug && String(blog.slug).trim();
+
+      if (!slug) {
+        const api = await import('../services/api');
+        if (typeof api.getBlogById === 'function') {
+          const blogData = await api.getBlogById(blog._id);
+          slug = blogData?.slug || blogData?.data?.slug || blogData?.blog?.slug;
+        }
+      }
+
+      if (!slug) slug = blog._id;
+
+      window.location.href = `/blog/${slug}`;
+    } catch (err) {
+      console.error('Failed to get slug and navigate:', err);
+      window.location.href = `/blog/${blog._id}`;
+    }
+  };
+
   return (
-    <div className="relative rounded overflow-hidden card-hover h-[400px] group">
-      <img 
-        src={blog.image} 
-        alt={blog.title} 
-        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={handleNavigate}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleNavigate();
+        }
+      }}
+      className="relative rounded overflow-hidden card-hover h-[400px] group cursor-pointer"
+    >
+      <img
+        src={blog.image}
+        alt={blog.title}
+        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
       />
       <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent" />
       <div className="absolute bottom-0 p-6 text-white space-y-3">
@@ -50,16 +82,15 @@ const TrendingStories = () => {
     fetchTrendingStories();
   }, []);
 
-  // Auto-slide effect
   useEffect(() => {
-    if (trendingStories.length <= 2) return; // Don't auto-slide if 2 or fewer items
+    if (trendingStories.length <= 2) return; 
 
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => {
         const maxIndex = trendingStories.length - 2;
         return prevIndex >= maxIndex ? 0 : prevIndex + 1;
       });
-    }, 5000); // 5 seconds
+    }, 5000); 
 
     return () => clearInterval(interval);
   }, [trendingStories.length]);
@@ -71,7 +102,6 @@ const TrendingStories = () => {
       setTrendingStories(data.trendingStories || []);
     } catch (error) {
       console.error('Error fetching trending stories:', error);
-      // Set empty array on error so component doesn't break
       setTrendingStories([]);
     } finally {
       setLoading(false);

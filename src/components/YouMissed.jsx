@@ -92,14 +92,14 @@ const YouMissed = () => {
     if (!el) return;
     const child = el.children[i % data.length];
     if (!child) return;
-    const targetLeft = child.offsetLeft; // horizontal target only
+    const targetLeft = child.offsetLeft;
     el.scrollTo({ left: targetLeft, behavior: 'smooth' });
   };
 
   useEffect(() => {
     const intervalMs = 4000;
     const tick = 50;
-    if (!isVisible || paused) return; // only run when visible and not paused
+    if (!isVisible || paused) return; 
     setProgress(0);
     const p = setInterval(() => setProgress((v) => Math.min(100, v + (100 * tick) / intervalMs)), tick);
     const t = setInterval(() => setIndex((i) => (i + 1) % data.length), intervalMs);
@@ -110,7 +110,6 @@ const YouMissed = () => {
     scrollToIndex(index);
   }, [index]);
 
-  // Observe visibility to avoid forcing page to jump when user is elsewhere
   useEffect(() => {
     const el = scrollerRef.current;
     if (!el) return;
