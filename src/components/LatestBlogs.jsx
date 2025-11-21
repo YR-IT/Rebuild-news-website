@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { getBlogs } from '../services/api';
 
 const Pill = ({ text, color = 'bg-red-600' }) => (
@@ -13,23 +14,27 @@ const BlogCard = ({ blog }) => {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
+  const blogId = blog.id || blog._id;
+
   return (
-    <div className="bg-white border border-gray-200 rounded p-3 flex gap-3 items-start card-hover">
-      <img 
-        src={blog.image} 
-        alt={blog.title} 
-        className="w-20 h-16 object-cover rounded shrink-0" 
-      />
-      <div className="min-w-0 flex-1">
-        <Pill text={blog.categoryId?.name?.toUpperCase() || 'BLOG'} />
-        <h4 className="text-sm font-semibold text-gray-900 mt-1 line-clamp-2">
-          {blog.title}
-        </h4>
-        <p className="text-[11px] text-gray-500 mt-0.5">
-          {formatDate(blog.date)} / {blog.author}
-        </p>
+    <Link to={`/blog/${blogId}`} className="block">
+      <div className="bg-white border border-gray-200 rounded p-3 flex gap-3 items-start card-hover cursor-pointer">
+        <img 
+          src={blog.image} 
+          alt={blog.title} 
+          className="w-20 h-16 object-cover rounded shrink-0" 
+        />
+        <div className="min-w-0 flex-1">
+          <Pill text={blog.categoryId?.name?.toUpperCase() || 'BLOG'} />
+          <h4 className="text-sm font-semibold text-gray-900 mt-1 line-clamp-2">
+            {blog.title}
+          </h4>
+          <p className="text-[11px] text-gray-500 mt-0.5">
+            {formatDate(blog.date)} / {blog.author}
+          </p>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
@@ -70,7 +75,7 @@ const LatestBlogs = () => {
         ) : (
           <div className="space-y-3 px-4 sm:px-0">
             {blogs.map((blog) => (
-              <BlogCard key={blog._id} blog={blog} />
+              <BlogCard key={blog._id || blog.id} blog={blog} />
             ))}
           </div>
         )}
