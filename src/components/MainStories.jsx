@@ -9,13 +9,35 @@ const Tag = ({ children, color = 'bg-red-600' }) => (
 );
 
 const BlogCard = ({ blog }) => {
+    const handleNavigate = async () => {
+    try {
+      let slug = blog.slug && String(blog.slug).trim();
+
+      if (!slug) {
+        const api = await import('../services/api');
+        if (typeof api.getBlogById === 'function') {
+          const blogData = await api.getBlogById(blog._id);
+          slug = blogData?.slug || blogData?.data?.slug || blogData?.blog?.slug;
+        }
+      }
+
+      if (!slug) slug = blog._id;
+
+      window.location.href = `/blog/${slug}`;
+    } catch (err) {
+      console.error('Failed to get slug and navigate:', err);
+      window.location.href = `/blog/${blog._id}`;
+    }
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
   return (
-    <div className="relative rounded overflow-hidden card-hover h-[400px] group">
+    <div  onClick={handleNavigate} className="relative cursor-pointer rounded overflow-hidden card-hover h-[400px] group">
+
       <img 
         src={blog.image} 
         alt={blog.title} 
