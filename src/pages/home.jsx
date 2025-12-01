@@ -4,7 +4,6 @@ import MainStories from '../components/MainStories'
 import TrendingStories from '../components/TrendingStories'
 import CategorySections from '../components/CategorySections'
 import LatestBlogs from '../components/LatestBlogs'
-import YouMissed from '../components/YouMissed'
 import Footer from '../components/Footer'
 import usePageTracking from '../Pagevisit'
 
@@ -29,7 +28,6 @@ const Home = () => {
 					</div>
 				</div>
 			</section>
-			<YouMissed />
 			<Footer />
 		</div>
 	)
