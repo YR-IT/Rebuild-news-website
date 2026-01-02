@@ -21,7 +21,12 @@ import EditBlogModal from '../components/admin/EditBlogModal';
 
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState('analytics');
+  // Add these to your state declarations (around line 20-30)
+const [contentBlocks, setContentBlocks] = useState([
+  { type: 'text', content: '', id: Date.now() }
+]);
 
+const [editContentBlocks, setEditContentBlocks] = useState([]);
   // Categories state
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -119,216 +124,323 @@ export default function AdminPanel() {
       setLoading(false);
     }
   }
+  
+    // Add these missing functions:
 
-  async function handleSubmit(e) {
+function handleBlogFormChange(e) {
+  const { name, value } = e.target;
+  setBlogForm(prev => ({
+    ...prev,
+    [name]: value
+  }));
+}
+
+function handleImageChange(e) {
+  const file = e.target.files[0];
+  if (file) {
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size must be less than 5MB');
+      return;
+    }
+    setImageFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function clearImage() {
+  setImageFile(null);
+  setImagePreview(null);
+}
+
+function handleEditFormChange(e) {
+  const { name, value } = e.target;
+  setEditModal(prev => ({
+    ...prev,
+    blog: {
+      ...prev.blog,
+      [name]: value
+    }
+  }));
+}
+
+async function fetchBlogs() {
+  try {
+    setBlogsLoading(true);
+    const data = await getBlogs();
+    setBlogs(data.blogs || []);
+  } catch (error) {
+    toast.error(error.message || 'Failed to load blogs');
+  } finally {
+    setBlogsLoading(false);
+  }
+}
+
+async function handleSubmit(e) {
+  e.preventDefault();
+
+  if (!categoryName.trim()) {
+    toast.error('Category name is required');
+    return;
+  }
+
+  try {
+    setSubmitting(true);
+    await createCategory({ name: categoryName.trim() });
+    toast.success('Category Added Successfully');
+    setCategoryName('');
+    fetchCategories();
+  } catch (error) {
+    toast.error(error.message || 'Failed to add category');
+  } finally {
+    setSubmitting(false);
+  }
+}
+
+function openDeleteModal(id, name) {
+  setDeleteModal({ isOpen: true, categoryId: id, categoryName: name });
+}
+
+function closeEditModal() {
+  setEditModal({ isOpen: false, blog: null });
+  setEditContentBlocks([]);
+  setImageFile(null);
+  setImagePreview(null);
+}
+
+
+
+async function confirmDelete() {
+  const { categoryId } = deleteModal;
+  try {
+    await deleteCategory(categoryId);
+    setCategories(prev => prev.filter(cat => cat._id !== categoryId));
+    toast.success('Category Deleted Successfully');
+    closeDeleteModal();
+  } catch (error) {
+    toast.error(error.message || 'Failed to delete category');
+    closeDeleteModal();
+  }
+}
+   async function handleBlogSubmit(e, modifiedForm) {
     e.preventDefault();
-    const trimmedName = categoryName.trim().replace(/\s+/g, ' ');
     
-    if (!trimmedName) {
-      toast.error('Category name is required');
-      return;
-    }
-    
-    if (trimmedName.length < 1 || trimmedName.length > 40) {
-      toast.error('Category name must be between 1 and 40 characters');
-      return;
-    }
-    
-    const duplicate = categories.find(cat => cat.name.toLowerCase() === trimmedName.toLowerCase());
-    if (duplicate) {
-      toast.error('Category already exists');
-      return;
-    }
-
-    try {
-      setSubmitting(true);
-      const data = await createCategory(trimmedName);
-      setCategories(prev => [...prev, data.category].sort((a, b) => a.name.localeCompare(b.name)));
-      setCategoryName('');
-      toast.success('Category added successfully');
-    } catch (error) {
-      toast.error(error.message || 'Failed to add category');
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  function openDeleteModal(id, name) {
-    setDeleteModal({ isOpen: true, categoryId: id, categoryName: name });
-  }
-
-  function closeDeleteModal() {
-    setDeleteModal({ isOpen: false, categoryId: null, categoryName: '' });
-  }
-
-  async function confirmDelete() {
-    const { categoryId } = deleteModal;
-    try {
-      await deleteCategory(categoryId);
-      setCategories(prev => prev.filter(cat => cat._id !== categoryId));
-      toast.success('Successfully Deleted');
-      closeDeleteModal();
-    } catch (error) {
-      toast.error(error.message || 'Failed to delete category');
-      closeDeleteModal();
-    }
-  }
-
-  // Blog functions
-  async function fetchBlogs() {
-    try {
-      setBlogsLoading(true);
-      const data = await getBlogs();
-      setBlogs(data.blogs || []);
-    } catch (error) {
-      toast.error(error.message || 'Failed to load blogs');
-    } finally {
-      setBlogsLoading(false);
-    }
-  }
-
-  function handleBlogFormChange(e) {
-    const { name, value } = e.target;
-    setBlogForm(prev => ({ ...prev, [name]: value }));
-  }
-
-  function handleImageChange(e) {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('Image size must be less than 5MB');
-        return;
-      }
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
-  function clearImage() {
-    setImageFile(null);
-    setImagePreview(null);
-  }
-
-  function resetBlogForm() {
-    setBlogForm({
-      categoryId: '',
-      title: '',
-      description: '',
-      author: '',
-      date: new Date().toISOString().split('T')[0],
-    });
-    clearImage();
-  }
-
-  async function handleBlogSubmit(e) {
-    e.preventDefault();
-
-    if (!blogForm.categoryId || !blogForm.title || !blogForm.description || !blogForm.author || !blogForm.date) {
+    // Validation
+    if (!blogForm.categoryId || !blogForm.title || !blogForm.author || !blogForm.date) {
       toast.error('All fields are required');
       return;
     }
-
+    
     if (!imageFile) {
-      toast.error('Please select an image');
+      toast.error('Please select a featured image');
       return;
     }
-
+    
     if (blogForm.title.trim().length < 1 || blogForm.title.trim().length > 200) {
       toast.error('Title must be between 1 and 200 characters');
       return;
     }
-
-    if (blogForm.description.trim().length < 10 || blogForm.description.trim().length > 5000) {
-      toast.error('Description must be between 10 and 5000 characters');
-      return;
-    }
-
+    
     if (blogForm.author.trim().length < 1 || blogForm.author.trim().length > 100) {
       toast.error('Author must be between 1 and 100 characters');
       return;
     }
-
+    
+    // Validate content blocks
+    const hasContent = modifiedForm.contentBlocks.some(block => {
+      if (block.type === 'text' && block.content.trim().length > 0) return true;
+      if (block.type === 'image' && block.content) return true;
+      return false;
+    });
+    
+    if (!hasContent) {
+      toast.error('Please add some content to your blog');
+      return;
+    }
+    
     try {
       setBlogSubmitting(true);
+      
       const formData = new FormData();
+      
+      // Add basic fields
       formData.append('categoryId', blogForm.categoryId);
       formData.append('title', blogForm.title.trim());
-      formData.append('description', blogForm.description.trim());
       formData.append('author', blogForm.author.trim());
       formData.append('date', blogForm.date);
-      formData.append('image', imageFile);
-
+      
+      // Add featured image
+      formData.append('featuredImage', imageFile);
+      
+      // Process content blocks
+      const contentBlocksData = [];
+      
+      modifiedForm.contentBlocks.forEach((block, index) => {
+        if (block.type === 'text') {
+          // Only add text blocks that have content
+          if (block.content.trim().length > 0) {
+            contentBlocksData.push({
+              type: 'text',
+              content: block.content.trim(),
+              order: index
+            });
+          }
+        } else if (block.type === 'image' && block.file) {
+          contentBlocksData.push({
+            type: 'image',
+            order: index
+          });
+          // Add image file to FormData
+          formData.append('contentImages', block.file);
+        }
+      });
+      
+      // Add content blocks metadata as JSON string
+      formData.append('contentBlocks', JSON.stringify(contentBlocksData));
+      
+      // Call API
       await createBlog(formData);
+      
       toast.success('Blog Added Successfully');
       resetBlogForm();
-      fetchBlogs();
+      fetchBlogs(); // Your existing function to refresh blog list
+      
     } catch (error) {
       toast.error(error.message || 'Failed to add blog');
     } finally {
       setBlogSubmitting(false);
     }
   }
-
   function openEditModal(blog) {
-    setEditModal({ isOpen: true, blog });
+    setEditModal({
+      isOpen: true,
+      blog: { ...blog }
+    });
+    
+    // Populate content blocks from existing blog
+    if (blog.contentBlocks && blog.contentBlocks.length > 0) {
+      const blocks = blog.contentBlocks.map(block => ({
+        type: block.type,
+        content: block.content,
+        id: block._id || Date.now() + Math.random(),
+      }));
+      setEditContentBlocks(blocks);
+    } else {
+      // Fallback if blog doesn't have content blocks
+      setEditContentBlocks([
+        { type: 'text', content: blog.description || '', id: Date.now() }
+      ]);
+    }
+    
+    // Set featured image preview if exists
+    if (blog.image || blog.featuredImage) {
+      setImagePreview(blog.image || blog.featuredImage);
+    }
   }
-
-  function closeEditModal() {
-    setEditModal({ isOpen: false, blog: null });
-  }
-
-  async function handleBlogUpdate(e) {
+  
+  
+  
+  async function handleBlogUpdate(e, modifiedForm) {
     e.preventDefault();
+    
     const { blog } = editModal;
-
-    if (!blog.categoryId || !blog.title || !blog.description || !blog.author || !blog.date) {
+    
+    // Validation
+    if (!blog.categoryId || !blog.title || !blog.author || !blog.date) {
       toast.error('All fields are required');
       return;
     }
-
+    
     if (blog.title.trim().length < 1 || blog.title.trim().length > 200) {
       toast.error('Title must be between 1 and 200 characters');
       return;
     }
-
-    if (blog.description.trim().length < 10 || blog.description.trim().length > 5000) {
-      toast.error('Description must be between 10 and 5000 characters');
-      return;
-    }
-
+    
     if (blog.author.trim().length < 1 || blog.author.trim().length > 100) {
       toast.error('Author must be between 1 and 100 characters');
       return;
     }
-
+    
+    // Validate content blocks
+    const hasContent = modifiedForm.contentBlocks.some(block => {
+      if (block.type === 'text' && block.content.trim().length > 0) return true;
+      if (block.type === 'image' && block.content) return true;
+      return false;
+    });
+    
+    if (!hasContent) {
+      toast.error('Please add some content to your blog');
+      return;
+    }
+    
     try {
       setBlogSubmitting(true);
+      
       const formData = new FormData();
       formData.append('categoryId', blog.categoryId);
       formData.append('title', blog.title.trim());
-      formData.append('description', blog.description.trim());
       formData.append('author', blog.author.trim());
       formData.append('date', blog.date);
+      
+      // Add featured image if updated
       if (imageFile) {
-        formData.append('image', imageFile);
+        formData.append('featuredImage', imageFile);
       }
-
+      
+      // Process content blocks
+      const contentBlocksData = [];
+      
+      modifiedForm.contentBlocks.forEach((block, index) => {
+        if (block.type === 'text') {
+          if (block.content.trim().length > 0) {
+            contentBlocksData.push({
+              type: 'text',
+              content: block.content.trim(),
+              order: index
+            });
+          }
+        } else if (block.type === 'image') {
+          if (block.file) {
+            // New image
+            contentBlocksData.push({
+              type: 'image',
+              order: index,
+              isNew: true
+            });
+            formData.append('contentImages', block.file);
+          } else if (block.content && block.content.startsWith('/uploads')) {
+            // Existing image
+            contentBlocksData.push({
+              type: 'image',
+              content: block.content,
+              order: index,
+              isNew: false
+            });
+          }
+        }
+      });
+      
+      formData.append('contentBlocks', JSON.stringify(contentBlocksData));
+      
       await updateBlog(blog._id, formData);
+      
       toast.success('Blog Updated Successfully');
       closeEditModal();
-      clearImage();
       fetchBlogs();
+      
     } catch (error) {
       toast.error(error.message || 'Failed to update blog');
     } finally {
       setBlogSubmitting(false);
     }
   }
-
+  function closeEditModal() {
+    setEditModal({ isOpen: false, blog: null });
+  }
+                    
   function openDeleteBlogModal(id, title) {
     setDeleteBlogModal({ isOpen: true, blogId: id, blogTitle: title });
   }
@@ -450,7 +562,22 @@ export default function AdminPanel() {
     setCarouselImageFile(null);
     setCarouselImagePreview(null);
   }
-
+   function resetBlogForm() {
+    setBlogForm({
+      categoryId: '',
+      title: '',
+      description: '',
+      author: '',
+      date: ''
+    });
+    setImageFile(null);
+    setImagePreview(null);
+    
+    // Reset content blocks to initial state
+    setContentBlocks([
+      { type: 'text', content: '', id: Date.now() }
+    ]);
+  }
   function resetCarouselForm() {
     setCarouselHeadline('');
     clearCarouselImage();
@@ -651,13 +778,22 @@ export default function AdminPanel() {
         {activeTab === 'addBlog' && (
           <AddBlogTab
             blogForm={blogForm}
-            handleBlogFormChange={handleBlogFormChange}
-            categories={categories}
-            imagePreview={imagePreview}
-            handleImageChange={handleImageChange}
-            clearImage={clearImage}
-            blogSubmitting={blogSubmitting}
-            handleBlogSubmit={handleBlogSubmit}
+        handleBlogFormChange={handleBlogFormChange}
+        categories={categories}
+        imagePreview={imagePreview}
+        handleImageChange={handleImageChange}
+        clearImage={clearImage}
+        blogSubmitting={blogSubmitting}
+        handleBlogSubmit={handleBlogSubmit}
+        contentBlocks={contentBlocks}
+        setContentBlocks={setContentBlocks}
+            
+            
+            
+            
+            
+            
+            
           />
         )}
 
@@ -743,16 +879,21 @@ export default function AdminPanel() {
 
       {/* Edit Blog Modal */}
       <EditBlogModal
-        editModal={editModal}
-        setEditModal={setEditModal}
-        categories={categories}
-        imagePreview={imagePreview}
-        handleImageChange={handleImageChange}
-        clearImage={clearImage}
-        blogSubmitting={blogSubmitting}
-        handleBlogUpdate={handleBlogUpdate}
-        closeEditModal={closeEditModal}
-      />
+  isOpen={editModal.isOpen}
+  blog={editModal.blog}
+  blogForm={editModal.blog}
+  handleBlogFormChange={handleEditFormChange}
+  categories={categories}
+  imagePreview={imagePreview}
+  handleImageChange={handleImageChange}
+  clearImage={clearImage}
+  blogSubmitting={blogSubmitting}
+  handleBlogSubmit={handleBlogUpdate}
+  contentBlocks={editContentBlocks}
+  setContentBlocks={setEditContentBlocks}
+  isEditMode={true}
+  closeModal={closeEditModal}
+/>
 
       {/* Delete Blog Confirmation Modal */}
       {deleteBlogModal.isOpen && (
