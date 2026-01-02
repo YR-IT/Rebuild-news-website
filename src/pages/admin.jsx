@@ -646,9 +646,14 @@ async function confirmDelete() {
   }
 
   function truncateText(text, maxLength) {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
-  }
+  if (!text) return '';
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, maxLength)}...`;
+}
+
+  
+  
+  
   if (!isAuth) {
     return (
       <div className="h-screen flex items-center justify-center text-gray-600">
